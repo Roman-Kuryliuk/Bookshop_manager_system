@@ -1,9 +1,37 @@
 #include <iostream>
 #include <conio.h>
+#include <mysql.h>
+#include <sstream>
 
 #include "login.h"
 
 using namespace std;
+
+MYSQL *conn;
+MYSQL_RES *res_set;
+MYSQL_ROW row;
+stringstream stmt;
+const char *q;
+string query;
+
+class books {
+    int id{};
+    string name;
+    string auth;
+    int price{};
+    int qty{};
+
+public:
+    void add();
+
+    void update_price();
+
+    void search();
+
+    void update();
+
+    void display();
+};
 
 /**
  * @brief Prompts the user to enter an 8-digit password.
@@ -32,17 +60,16 @@ void pass() {
     int num = 0;
     cout << "Enter password : ";
 
-    for (int i=0; i<8; i++) {
-        num=num*10+(getch()-48);
-        cout<<"*";
+    for (int i = 0; i < 8; i++) {
+        num = num * 10 + (getch() - 48);
+        cout << "*";
     }
 
     if (num == PASSWORD) {
         cout << endl << "Correct password!" << endl << endl;
         cout << "Press any key...";
         getch();
-    }
-    else {
+    } else {
         cout << endl << endl << "Incorrect password!" << endl << endl;
         cout << "Press any key...";
         getch();
@@ -50,8 +77,46 @@ void pass() {
     }
 }
 
-int main() {
+void book_menu() {
+    books b;
+}
+
+void main_menu() {
+    int c;
+    cout << "*************************************************" << endl;
+    cout << "         BOOKSHOP MANAGEMENT SYSTEM" << endl;
+    cout << "*************************************************" << endl;
+    cout << "   1. BOOKS" << endl;
+    cout << "   2. SUPPLIERS" << endl;
+    cout << "   3. PURCHASES" << endl;
+    cout << "   4. EMPLOYEES" << endl;
+    cout << "   5. MEMBERS" << endl;
+    cout << "   6. SALES" << endl;
+    cout << "   7. EXIT" << endl << endl << endl;
+    cout << "Enter Your Choice : ";
+    cin >> c;
+
+    switch (c) {
+        case 1:
+            system("cls");
+            book_menu();
+        case 2:
+        default: ;
+    }
+}
+
+[[noreturn]] int main() {
     pass();
+
+    conn = mysql_init(nullptr);
+    conn = mysql_real_connect(conn, HOST, USER, PASS, DATABASE, PORT, nullptr, 0);
+
+    if (conn) {
+        while (TRUE) {
+            system("cls");
+            main_menu();
+        }
+    }
+
     system("cls");
-    return 0;
 }
