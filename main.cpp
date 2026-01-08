@@ -14,6 +14,15 @@ stringstream stmt;
 const char *q;
 string query;
 
+/**
+ * @brief Represents a book entity with attributes and operations related to books.
+ *
+ * This class provides methods to manage book-related data, including adding books,
+ * updating price information, searching for a specific book, updating details
+ * of a book, and displaying the list of books.
+ *
+ * The class interacts with a database to persist and retrieve book data.
+ */
 class books {
     int id{};
     string name;
@@ -24,14 +33,51 @@ class books {
 public:
     void add();
 
-    void update_price();
+    static void update_price();
 
-    void search();
+    static void search();
 
-    void update();
+    static void update();
 
-    void display();
+    static void display();
 };
+
+void books::add() {
+    cout << "Enter the name of the book : ";
+    cin >> name;
+    cout << "Enter the name of the author : ";
+    cin >> auth;
+    cout << "Enter the Price :";
+    cin >> price;
+    cout << "Enter the Qty Received : ";
+    cin >> qty;
+
+    stmt.str("");
+    stmt << "INSERT INTO books (name, auth, price, qty) VALUES ('" << name << "', '" << auth << "', '" << price <<
+            "', '" << qty << "')";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+    res_set = mysql_store_result(conn);
+
+    if (!res_set) {
+        cout << endl << endl << "Book Record Inserter Successfully" << endl << endl << endl;
+    } else {
+        cout << endl << endl << "Entry ERROR !" << endl << "Contact Technical Team" << endl << endl << endl;
+    }
+}
+
+void books::update_price() {
+}
+
+void books::search() {
+}
+
+void books::update() {
+}
+
+void books::display() {
+}
 
 /**
  * @brief Prompts the user to enter an 8-digit password.
