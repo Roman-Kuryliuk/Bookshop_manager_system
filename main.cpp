@@ -125,6 +125,27 @@ void pass() {
 
 void book_menu() {
     books b;
+
+    int c;
+    cout << "*************************************************" << endl;
+    cout << "                  BOOK MENU" << endl;
+    cout << "*************************************************" << endl;
+    cout << "   1. ADD" << endl;
+    cout << "   2. UPDATE PRICE" << endl;
+    cout << "   3. SEARCH" << endl;
+    cout << "   4. UPDATE STATUS" << endl;
+    cout << "   5. DISPLAY ALL" << endl;
+    cout << "   6. RETURN TO MAIN MENU" << endl << endl << endl;
+    cout << "Enter Your Choice : ";
+    cin >> c;
+
+    switch (c) {
+        case 1:
+            b.add();
+            break;
+        case 2:
+        default: ;
+    }
 }
 
 void main_menu() {
