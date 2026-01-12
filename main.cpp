@@ -33,7 +33,7 @@ class books {
 public:
     void add();
 
-    static void update_price();
+    void update_price();
 
     static void search();
 
@@ -42,6 +42,17 @@ public:
     static void display();
 };
 
+/**
+ * @brief Adds a new book record to the books' database.
+ *
+ * This method collects details of a book such as its name, author, price, and quantity
+ * from the user and inserts the corresponding record into the database. It constructs
+ * an SQL query dynamically and executes it to persist the data. If the operation is
+ * successful, the user is notified; otherwise, an error message is displayed.
+ *
+ * The database interaction relies on a global MySQL connection and uses standard input
+ * and output for user interaction.
+ */
 void books::add() {
     cout << "Enter the name of the book : ";
     cin >> name;
@@ -67,7 +78,64 @@ void books::add() {
     }
 }
 
+/**
+ * @brief Updates the price of a specific book in the database.
+ *
+ * This method prompts the user to enter the ID of the book whose price
+ * needs to be updated. It retrieves the current details of the book,
+ * including its name and price, and presents them to the user.
+ * The user is then given the option to confirm whether they want to update
+ * the price. If confirmed, the new price is input by the user and updated
+ * in the database. If the ID provided does not correspond to a book
+ * in the database, an appropriate message is displayed.
+ *
+ * Error handling is integrated to notify the user in case the update operation
+ * encounters any issues.
+ */
 void books::update_price() {
+    cout << "Enter the id of the book for update in price : ";
+    cin >> id;
+
+    stmt.str("");
+    stmt << "Select name,price from books where id = " << id << ";";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+    res_set = mysql_store_result(conn);
+
+    if ((row = mysql_fetch_row(res_set)) != nullptr) {
+        char choice;
+        cout << "The Name of the book is : " << row[0] << endl;
+        cout << "The current price of the book is : " << row[1] << endl;
+        cout << "Do you Want to Update the Price [y/n] : ";
+        cin >> choice;
+
+        if (choice == 121 || choice == 89) {
+            cout << "Enter the new price : ";
+            cin >> price;
+
+            stmt.str("");
+            stmt << "UPDATE books SET price = " << price << " WHERE id = " << id << ";";
+            query = stmt.str();
+            q = query.c_str();
+            mysql_query(conn, q);
+            res_set = mysql_store_result(conn);
+
+            if (!res_set) {
+                cout << endl << endl << "Book Price Updated Successfully" << endl << endl << endl;
+                getch();
+            } else {
+                cout << endl << endl << "Entry ERROR !" << endl << "Contact Technical Team" << endl << endl << endl;
+                getch();
+            }
+        } else {
+            cout << "No changes Made!!";
+            getch();
+        }
+    } else {
+        cout << "No Book found!!";
+        getch();
+    }
 }
 
 void books::search() {
@@ -144,6 +212,8 @@ void book_menu() {
             b.add();
             break;
         case 2:
+            b.update_price();
+            break;
         default: ;
     }
 }
