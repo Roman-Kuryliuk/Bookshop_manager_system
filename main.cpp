@@ -35,7 +35,7 @@ public:
 
     void update_price();
 
-    static void search();
+    void search();
 
     static void update();
 
@@ -138,7 +138,41 @@ void books::update_price() {
     }
 }
 
+/**
+ * @brief Searches for a book in the database using its unique identifier.
+ *
+ * This function prompts the user to enter the book ID and queries the database
+ * for the corresponding book details. If the book exists, it retrieves and
+ * displays details such as the book's name, author, price, and inventory count.
+ * If no record is found, an appropriate message is displayed.
+ *
+ * The function interacts directly with a MySQL database to perform the search query
+ * and process the results. It uses internal member variables and database
+ * connection objects for query execution and result handling.
+ */
 void books::search() {
+    cout << "Enter book id for details : ";
+    cin >> id;
+
+    stmt.str("");
+    stmt << "Select * from books where id = " << id << ";";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+    res_set = mysql_store_result(conn);
+
+    if ((row = mysql_fetch_row(res_set)) != nullptr) {
+        cout << "the Details of Book Id " << row[0] << endl;
+        cout << "The Name of the book is : " << row[1] << endl;
+        cout << "THE Author of " << row[1] << " is " << row[2] << endl;
+        cout << "The Price of the book is : " << row[3] << endl;
+        cout << "The inventory count is " << row[4] << endl;
+        getch();
+    }
+    else {
+        cout << "No record Found" << endl;
+        getch();
+    }
 }
 
 void books::update() {
@@ -213,6 +247,9 @@ void book_menu() {
             break;
         case 2:
             b.update_price();
+            break;
+        case 3:
+            b.search();
             break;
         default: ;
     }
