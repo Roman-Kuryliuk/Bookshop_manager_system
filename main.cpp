@@ -168,14 +168,48 @@ void books::search() {
         cout << "The Price of the book is : " << row[3] << endl;
         cout << "The inventory count is " << row[4] << endl;
         getch();
-    }
-    else {
+    } else {
         cout << "No record Found" << endl;
         getch();
     }
 }
 
 void books::update() {
+    int b_id[100],qty[100],i=0;
+    stmt.str("");
+    stmt << "Select book_id,qty from purchases where receives = 'T' and inv IS NULL;";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+    res_set = mysql_store_result(conn);
+    stmt.str("");
+    stmt << "Update purchases set inv = 1 where receives = 'T' and inv IS NULL;";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+
+    while ((row = mysql_fetch_row(res_set)) != nullptr) {
+
+        if (row[0] != nullptr) {
+            b_id[i] = std::stoi(row[0]);
+        }
+
+        qty[i] = row[1] ? std::stoi(row[1]) : 0;
+
+        i++;
+    }
+
+    const int max = i;
+
+    for (i = 0; i <= max; i++) {
+        stmt.str("");
+        stmt << "update books set qty = " << qty[i] << " where id = " << b_id[i] << ";";
+        query = stmt.str();
+        q = query.c_str();
+        mysql_query(conn, q);
+    }
+
+    cout << "The orders received have been updated.";
 }
 
 void books::display() {
@@ -250,6 +284,9 @@ void book_menu() {
             break;
         case 3:
             b.search();
+            break;
+        case 4:
+            books::update();
             break;
         default: ;
     }
