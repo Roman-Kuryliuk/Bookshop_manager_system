@@ -168,14 +168,64 @@ void books::search() {
         cout << "The Price of the book is : " << row[3] << endl;
         cout << "The inventory count is " << row[4] << endl;
         getch();
-    }
-    else {
+    } else {
         cout << "No record Found" << endl;
         getch();
     }
 }
 
+/**
+ * @brief Updates the inventory and purchase records in the database.
+ *
+ * This static method synchronizes the quantities of books in the inventory based on the purchase orders
+ * received. It performs the following operations:
+ * - Retrieves a list of books and their quantities from the purchases table where the status
+ *   indicates they have been received and do not yet have an invoice marked.
+ * - Updates the purchases table to mark these received orders as invoiced.
+ * - Iterates through the retrieved records and adjusts the inventory of the corresponding books
+ *   in the books table by updating their quantities.
+ *
+ * The method communicates with a MySQL database using queries for data retrieval and updates.
+ * It assumes active connections and initialized global variables for interacting with the database.
+ *
+ * The output is a confirmation message indicating that the orders have been successfully updated.
+ */
 void books::update() {
+    int b_id[100],qty[100],i=0;
+    stmt.str("");
+    stmt << "Select book_id,qty from purchases where receives = 'T' and inv IS NULL;";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+    res_set = mysql_store_result(conn);
+    stmt.str("");
+    stmt << "Update purchases set inv = 1 where receives = 'T' and inv IS NULL;";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+
+    while ((row = mysql_fetch_row(res_set)) != nullptr) {
+
+        if (row[0] != nullptr) {
+            b_id[i] = std::stoi(row[0]);
+        }
+
+        qty[i] = row[1] ? std::stoi(row[1]) : 0;
+
+        i++;
+    }
+
+    const int max = i;
+
+    for (i = 0; i <= max; i++) {
+        stmt.str("");
+        stmt << "update books set qty = " << qty[i] << " where id = " << b_id[i] << ";";
+        query = stmt.str();
+        q = query.c_str();
+        mysql_query(conn, q);
+    }
+
+    cout << "The orders received have been updated.";
 }
 
 void books::display() {
@@ -250,6 +300,9 @@ void book_menu() {
             break;
         case 3:
             b.search();
+            break;
+        case 4:
+            books::update();
             break;
         default: ;
     }
