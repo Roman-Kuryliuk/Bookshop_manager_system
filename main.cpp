@@ -7,11 +7,11 @@
 
 using namespace std;
 
-MYSQL *conn;
-MYSQL_RES *res_set;
+MYSQL* conn;
+MYSQL_RES* res_set;
 MYSQL_ROW row;
 stringstream stmt;
-const char *q;
+const char* q;
 string query;
 
 /**
@@ -23,7 +23,8 @@ string query;
  *
  * The class interacts with a database to persist and retrieve book data.
  */
-class books {
+class books
+{
     int id{};
     string name;
     string auth;
@@ -53,7 +54,8 @@ public:
  * The database interaction relies on a global MySQL connection and uses standard input
  * and output for user interaction.
  */
-void books::add() {
+void books::add()
+{
     cout << "Enter the name of the book : ";
     cin >> name;
     cout << "Enter the name of the author : ";
@@ -65,15 +67,18 @@ void books::add() {
 
     stmt.str("");
     stmt << "INSERT INTO books (name, auth, price, qty) VALUES ('" << name << "', '" << auth << "', '" << price <<
-            "', '" << qty << "')";
+        "', '" << qty << "')";
     query = stmt.str();
     q = query.c_str();
     mysql_query(conn, q);
     res_set = mysql_store_result(conn);
 
-    if (!res_set) {
+    if (!res_set)
+    {
         cout << endl << endl << "Book Record Inserter Successfully" << endl << endl << endl;
-    } else {
+    }
+    else
+    {
         cout << endl << endl << "Entry ERROR !" << endl << "Contact Technical Team" << endl << endl << endl;
     }
 }
@@ -92,7 +97,8 @@ void books::add() {
  * Error handling is integrated to notify the user in case the update operation
  * encounters any issues.
  */
-void books::update_price() {
+void books::update_price()
+{
     cout << "Enter the id of the book for update in price : ";
     cin >> id;
 
@@ -103,14 +109,16 @@ void books::update_price() {
     mysql_query(conn, q);
     res_set = mysql_store_result(conn);
 
-    if ((row = mysql_fetch_row(res_set)) != nullptr) {
+    if ((row = mysql_fetch_row(res_set)) != nullptr)
+    {
         char choice;
         cout << "The Name of the book is : " << row[0] << endl;
         cout << "The current price of the book is : " << row[1] << endl;
         cout << "Do you Want to Update the Price [y/n] : ";
         cin >> choice;
 
-        if (choice == 121 || choice == 89) {
+        if (choice == 121 || choice == 89)
+        {
             cout << "Enter the new price : ";
             cin >> price;
 
@@ -121,18 +129,25 @@ void books::update_price() {
             mysql_query(conn, q);
             res_set = mysql_store_result(conn);
 
-            if (!res_set) {
+            if (!res_set)
+            {
                 cout << endl << endl << "Book Price Updated Successfully" << endl << endl << endl;
                 getch();
-            } else {
+            }
+            else
+            {
                 cout << endl << endl << "Entry ERROR !" << endl << "Contact Technical Team" << endl << endl << endl;
                 getch();
             }
-        } else {
+        }
+        else
+        {
             cout << "No changes Made!!";
             getch();
         }
-    } else {
+    }
+    else
+    {
         cout << "No Book found!!";
         getch();
     }
@@ -150,7 +165,8 @@ void books::update_price() {
  * and process the results. It uses internal member variables and database
  * connection objects for query execution and result handling.
  */
-void books::search() {
+void books::search()
+{
     cout << "Enter book id for details : ";
     cin >> id;
 
@@ -161,14 +177,17 @@ void books::search() {
     mysql_query(conn, q);
     res_set = mysql_store_result(conn);
 
-    if ((row = mysql_fetch_row(res_set)) != nullptr) {
+    if ((row = mysql_fetch_row(res_set)) != nullptr)
+    {
         cout << "the Details of Book Id " << row[0] << endl;
         cout << "The Name of the book is : " << row[1] << endl;
         cout << "THE Author of " << row[1] << " is " << row[2] << endl;
         cout << "The Price of the book is : " << row[3] << endl;
         cout << "The inventory count is " << row[4] << endl;
         getch();
-    } else {
+    }
+    else
+    {
         cout << "No record Found" << endl;
         getch();
     }
@@ -190,8 +209,9 @@ void books::search() {
  *
  * The output is a confirmation message indicating that the orders have been successfully updated.
  */
-void books::update() {
-    int b_id[100],qty[100],i=0;
+void books::update()
+{
+    int b_id[100], qty[100], i = 0;
     stmt.str("");
     stmt << "Select book_id,qty from purchases where receives = 'T' and inv IS NULL;";
     query = stmt.str();
@@ -204,9 +224,10 @@ void books::update() {
     q = query.c_str();
     mysql_query(conn, q);
 
-    while ((row = mysql_fetch_row(res_set)) != nullptr) {
-
-        if (row[0] != nullptr) {
+    while ((row = mysql_fetch_row(res_set)) != nullptr)
+    {
+        if (row[0] != nullptr)
+        {
             b_id[i] = std::stoi(row[0]);
         }
 
@@ -217,7 +238,8 @@ void books::update() {
 
     const int max = i;
 
-    for (i = 0; i <= max; i++) {
+    for (i = 0; i <= max; i++)
+    {
         stmt.str("");
         stmt << "update books set qty = " << qty[i] << " where id = " << b_id[i] << ";";
         query = stmt.str();
@@ -228,7 +250,8 @@ void books::update() {
     cout << "The orders received have been updated.";
 }
 
-void books::display() {
+void books::display()
+{
 }
 
 /**
@@ -254,20 +277,25 @@ void books::display() {
  * - Outputs asterisks (*) to the console for masking input digits.
  * - Terminates with error status if the password is incorrect.
  */
-void pass() {
+void pass()
+{
     int num = 0;
     cout << "Enter password : ";
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         num = num * 10 + (getch() - 48);
         cout << "*";
     }
 
-    if (num == PASSWORD) {
+    if (num == PASSWORD)
+    {
         cout << endl << "Correct password!" << endl << endl;
         cout << "Press any key...";
         getch();
-    } else {
+    }
+    else
+    {
         cout << endl << endl << "Incorrect password!" << endl << endl;
         cout << "Press any key...";
         getch();
@@ -275,7 +303,8 @@ void pass() {
     }
 }
 
-void book_menu() {
+void book_menu()
+{
     books b;
 
     int c;
@@ -291,24 +320,30 @@ void book_menu() {
     cout << "Enter Your Choice : ";
     cin >> c;
 
-    switch (c) {
-        case 1:
-            b.add();
-            break;
-        case 2:
-            b.update_price();
-            break;
-        case 3:
-            b.search();
-            break;
-        case 4:
-            books::update();
-            break;
-        default: ;
+    switch (c)
+    {
+    case 1:
+        b.add();
+        break;
+    case 2:
+        b.update_price();
+        break;
+    case 3:
+        b.search();
+        break;
+    case 4:
+        books::update();
+        break;
+    case 5:
+        books::display();
+        break;
+    default:
+        cout << "Wrong Choice!" << endl << "Invalid input!" << endl << endl;
     }
 }
 
-void main_menu() {
+void main_menu()
+{
     int c;
     cout << "*************************************************" << endl;
     cout << "         BOOKSHOP MANAGEMENT SYSTEM" << endl;
@@ -323,23 +358,27 @@ void main_menu() {
     cout << "Enter Your Choice : ";
     cin >> c;
 
-    switch (c) {
-        case 1:
-            system("cls");
-            book_menu();
-        case 2:
-        default: ;
+    switch (c)
+    {
+    case 1:
+        system("cls");
+        book_menu();
+    case 2:
+    default: ;
     }
 }
 
-[[noreturn]] int main() {
+[[noreturn]] int main()
+{
     pass();
 
     conn = mysql_init(nullptr);
     conn = mysql_real_connect(conn, HOST, USER, PASS, DATABASE, PORT, nullptr, 0);
 
-    if (conn) {
-        while (TRUE) {
+    if (conn)
+    {
+        while (TRUE)
+        {
             system("cls");
             main_menu();
         }
