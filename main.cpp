@@ -198,11 +198,11 @@ void books::search()
  *
  * This static method synchronizes the quantities of books in the inventory based on the purchase orders
  * received. It performs the following operations:
- * - Retrieves a list of books and their quantities from the purchases table where the status
+ * - Retrieves a list of books and their quantities from the purchases' table where the status
  *   indicates they have been received and do not yet have an invoice marked.
- * - Updates the purchases table to mark these received orders as invoiced.
+ * - Updates the purchases' table to mark these received orders as invoiced.
  * - Iterates through the retrieved records and adjusts the inventory of the corresponding books
- *   in the books table by updating their quantities.
+ *   in the books' table by updating their quantities.
  *
  * The method communicates with a MySQL database using queries for data retrieval and updates.
  * It assumes active connections and initialized global variables for interacting with the database.
@@ -252,6 +252,23 @@ void books::update()
 
 void books::display()
 {
+    stmt.str("");
+    stmt << "Select * from books;";
+    query = stmt.str();
+    q = query.c_str();
+    mysql_query(conn, q);
+    res_set = mysql_store_result(conn);
+
+    while ((row = mysql_fetch_row(res_set)) != nullptr)
+    {
+        cout << "The Name of the book is : " << row[0] << endl;
+        cout << "THE Author of " << row[0] << " is " << row[1] << endl;
+        cout << "The Price of the book is : " << row[2] << endl;
+        cout << "The inventory count is " << row[3] << endl;
+        cout << endl;
+    }
+
+    getch();
 }
 
 /**
@@ -342,6 +359,11 @@ void book_menu()
     }
 }
 
+void clear_screen()
+{
+    cout << "\033[2J\033[H";
+}
+
 void main_menu()
 {
     int c;
@@ -361,7 +383,7 @@ void main_menu()
     switch (c)
     {
     case 1:
-        system("cls");
+        clear_screen();
         book_menu();
     case 2:
     default: ;
@@ -373,16 +395,32 @@ void main_menu()
     pass();
 
     conn = mysql_init(nullptr);
-    conn = mysql_real_connect(conn, HOST, USER, PASS, DATABASE, PORT, nullptr, 0);
 
-    if (conn)
+    if (conn == nullptr)
     {
-        while (TRUE)
-        {
-            system("cls");
-            main_menu();
-        }
+        cerr << "mysql_init() failed" << endl;
+        getch();
+        exit(1);
     }
 
-    system("cls");
+    constexpr unsigned int ssl_mode = SSL_MODE_VERIFY_CA;
+    mysql_options(conn, MYSQL_OPT_SSL_MODE, &ssl_mode);
+
+    const auto ca_path = "C:/Users/User/Desktop/Archive/Programming/Bookshop_manager_system/certs/ca.pem";
+    mysql_options(conn, MYSQL_OPT_SSL_CA, ca_path);
+
+    if (const MYSQL* connection_result = mysql_real_connect(conn, HOST, USER, PASS, DATABASE, PORT, nullptr, 0);
+        connection_result == nullptr)
+    {
+        cerr << "Connection failed: " << mysql_error(conn) << endl;
+        getch();
+        mysql_close(conn);
+        exit(1);
+    }
+
+    while (TRUE)
+    {
+        system("cls");
+        main_menu();
+    }
 }
